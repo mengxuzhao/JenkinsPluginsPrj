@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <org.jenkinsci.plugins.customizebuildnow.BuildNowTextProperty plugin="customize-build-now@1.1">
+      <alternateBuildNow>Build And Deploy</alternateBuildNow>
+    </org.jenkinsci.plugins.customizebuildnow.BuildNowTextProperty>
+    <com.synopsys.arc.jenkinsci.plugins.jobrestrictions.jobs.JobRestrictionProperty plugin="job-restrictions@0.4"/>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <org.biouno.unochoice.DynamicReferenceParameter plugin="uno-choice@1.2">
+          <name>Injections</name>
+          <description></description>
+          <randomName>choice-parameter-9076847025532</randomName>
+          <script class="org.biouno.unochoice.model.GroovyScript">
+            <script>html =
+    &apos;&apos;&apos;
+        &lt;!DOCTYPE html&gt;
+        &lt;html&gt;
+            &lt;body&gt;
+                &lt;p&gt;Click on the following link to load injections in a separate window for review and modifications.&lt;/p&gt;
+                &lt;p&gt;&lt;h3&gt;&lt;a href=&quot;#Injections&quot; onclick=&quot;reviewAndModifyInjections();&quot;&gt;Review And Modify Application Injections&lt;/a&gt;&lt;/h3&gt;&lt;/p&gt;
+                &lt;script&gt;
+                    function reviewAndModifyInjections() {
+                        window.open(&quot;https://jenkins.shine.telstra.nonprod.cloud.shinetech.net/userContent/html/cdf.injections.form.html&quot;, &quot;newwindow&quot;, &quot;width=600, height=550&quot;);
+                    }
+                    function updateParamValue(data) {
+                        document.getElementById(&quot;paramValue&quot;).value = data;
+                    }
+                &lt;/script&gt;
+                &lt;input id=&quot;paramValue&quot; name=&quot;value&quot; type=&quot;hidden&quot; /&gt;
+            &lt;/body&gt;
+        &lt;/html&gt;
+    &apos;&apos;&apos;
+return html</script>
+            <fallbackScript></fallbackScript>
+          </script>
+          <visibleItemCount>1</visibleItemCount>
+          <parameters class="linked-hash-map"/>
+          <referencedParameters></referencedParameters>
+          <choiceType>ET_FORMATTED_HTML</choiceType>
+          <omitValueField>true</omitValueField>
+        </org.biouno.unochoice.DynamicReferenceParameter>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <jdk>(System)</jdk>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+DATE=$(date &quot;+%Y%m%d%H%M%S&quot;)
+mkdir -p injections
+if [[ $Injections != &quot;&quot; ]]; then
+    echo $Injections &gt; injections/injections.txt
+    /var/lib/jenkins/bin/cdf-injections-manager.sh
+    /usr/local/bin/aws s3 sync injections s3://telstra-stage-injections/cdf/${DATE} --sse
+fi</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>cp injections/* /var/lib/jenkins/jobs/AWS-cloud-dataflow/workspace/injections/</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <script>
+        function addInjection() {
+            var table = document.getElementById("injectionTable");
+            var row = table.insertRow(-1);
+            var cell1 = row.insertCell(0);
+            var cell2 = row.insertCell(1);
+            var cell3 = row.insertCell(2);
+            cell1.innerHTML = "<input type='checkbox' name='del'/>";
+            cell2.innerHTML = "<input style='width:100%' name='placeholder' type='text' />";
+            cell3.innerHTML = "<input style='width:100%' name='injectionvalue' type='text' />";
+            document.getElementById("paramValue").value = table.innerHTML;
+        }
+
+        function deleteInjections() {
+           try {
+               var table = document.getElementById("injectionTable");
+               var rowCount = table.rows.length;
+ 
+               for(var i = 0; i < rowCount; i++) {
+                   var row = table.rows[i];
+                   var chkbox = row.cells[0].childNodes[0];
+                   if(null != chkbox && true == chkbox.checked) {
+                       table.deleteRow(i);
+                       rowCount--;
+                       i--;
+                   }
+               }
+            } catch(e) {
+                alert(e);
+            }
+        }
+
+        function readForm() {
+            var inputs, injectiondata;
+            inputs = document.getElementsByTagName('input');
+            injectiondata = "";
+            for ( var i = 1; i <= inputs.length; i += 3) {
+                if ( i % 3 == 1 ) {
+                    injectiondata = injectiondata + inputs[i].value.trim() + "=" + inputs[i+1].value.trim() + "|";
+                }
+            }
+            //window.opener.updateParamValue(injectiondata);
+            alert("******"+injectiondata+"********")
+            window.close();
+       }
+    </script>
+
+    <form id="injectionForm" method="post" onsubmit="readForm()">
+        <table id="injectionTable" border="1" width="100%">
+            <tr>
+                <td style="width:1px"><b><i>Tick for Deletion</i></b></td>
+                <td><b><center>PlaceHolder</center></b></td>
+                <td><b><center>InjectionValue</center></b></td>
+            </tr>
+            <!--INJECTIONS-->
+        </table>
+        <br/>
+        <br/>
+        <button type="button" onclick="addInjection();"><font size=2>Add New Injection</font></button>
+        <button type="button" onclick="deleteInjections();"><font size=2>Delete Injection(s)</font></button>
+        <br/>
+        <br/>
+        <hr/>
+        <p><h3><font color="purple">Note: Injection changes will NOT be saved until a build is triggered!</font></h3></p>
+        <hr/>
+        <br/>
+        <button type="submit"><font size=2>Submit And Close</font></button>
+        <button type="button" onclick="self.close()"><font size=2>Close Without Change</font></button>
+        <br/>
+    </form>
+</html>
